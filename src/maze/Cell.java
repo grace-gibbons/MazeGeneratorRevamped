@@ -3,8 +3,8 @@ package maze;
 import java.util.ArrayList;
 
 public class Cell {
-    private int x;
-    private int y;
+    private final int x;
+    private final int y;
 
     private boolean hasRightWall = true;
     private boolean hasBottomWall = true;
@@ -17,9 +17,39 @@ public class Cell {
         this.y = y;
     }
 
+    /**
+     * Add a neighbouring cell to the list
+     * @param cell
+     */
     public void addNeighbour(Cell cell) {
         if(!neighbours.contains(cell)) {
             neighbours.add(cell);
+        }
+    }
+
+    /**
+     * Remove the wall between two cells
+     * @param next The cell next to the current cell
+     */
+    public void removeWall(Cell next) {
+        //If next cell is left of the current cell
+        if(next.getX() + 1 == getX() && next.getY() == getY()) {
+            next.setHasRightWall(false);
+        }
+
+        //If next cell is right of the current cell
+        if(next.getX() - 1 == getX() && next.getY() == getY()) {
+            setHasRightWall(false);
+        }
+
+        //If next cell is on top of the current cell
+        if(next.getY() + 1 == getY() && next.getX() == getX()) {
+            next.setHasBottomWall(false);
+        }
+
+        //If next cell is below of the current cell
+        if(next.getY() - 1 == getY() && next.getX() == getX()) {
+            setHasBottomWall(false);
         }
     }
 
@@ -43,6 +73,14 @@ public class Cell {
         return neighbours;
     }
 
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
     @Override
     public boolean equals(Object o) {
         if(o instanceof Cell) {
@@ -52,15 +90,6 @@ public class Cell {
             }
         }
         return false;
-    }
-
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
     }
 
     @Override

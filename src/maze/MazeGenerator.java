@@ -54,23 +54,29 @@ public class MazeGenerator {
             }
         }
 
-        currentCell = maze[0][0];
+        //Choose a random starting cell
+        int randomRow = (int)(Math.random() * rows);
+        int randomCol = (int)(Math.random() * columns);
+        currentCell = maze[randomCol][randomRow];
         visitedList.add(currentCell);
         previousQueue.add(currentCell);
     }
 
     public void generate() {
-        //Get a random unvisited neighbour of the current cell
-        Cell nextCell = getRandUnvisitedNeighbour(currentCell);
+        //Generate the maze while there are unvisited cells
+        if(getVisitedList().size() != getTotalCells()) {
+            //Get a random unvisited neighbour of the current cell
+            Cell nextCell = getRandUnvisitedNeighbour(currentCell);
 
-        if(nextCell != null) {
-            removeWall(currentCell, nextCell);
-            currentCell = nextCell;
-            previousQueue.add(currentCell);
-            visitedList.add(currentCell);
-        } else {
-            if(!previousQueue.isEmpty()) {
-                currentCell = previousQueue.remove(0);
+            if(nextCell != null) {
+                currentCell.removeWall(nextCell);
+                currentCell = nextCell;
+                previousQueue.add(currentCell);
+                visitedList.add(currentCell);
+            } else {
+                if(!previousQueue.isEmpty()) {
+                    currentCell = previousQueue.remove(0);
+                }
             }
         }
     }
@@ -86,28 +92,6 @@ public class MazeGenerator {
             }
         }
         return null;
-    }
-
-    public void removeWall(Cell current, Cell next) {
-        //If next cell is left of the current cell
-        if(next.getX() + 1 == current.getX() && next.getY() == current.getY()) {
-            next.setHasRightWall(false);
-        }
-
-        //If next cell is right of the current cell
-        if(next.getX() - 1 == current.getX() && next.getY() == current.getY()) {
-            current.setHasRightWall(false);
-        }
-
-        //If next cell is on top of the current cell
-        if(next.getY() + 1 == current.getY() && next.getX() == current.getX()) {
-            next.setHasBottomWall(false);
-        }
-
-        //If next cell is below of the current cell
-        if(next.getY() - 1 == current.getY() && next.getX() == current.getX()) {
-            current.setHasBottomWall(false);
-        }
     }
 
     public int getRows() {
