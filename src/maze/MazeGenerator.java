@@ -15,7 +15,11 @@ public class MazeGenerator {
     //Store each cell that has been visited during maze generation
     private List<Cell> visitedList;
 
+    private List<Cell> path;
+
     private Cell currentCell;
+
+    private boolean noLoop = true;
 
     public MazeGenerator(int rows, int columns) {
         MazeGenerator.rows = rows;
@@ -24,6 +28,7 @@ public class MazeGenerator {
         maze = new Cell[columns][rows];
         previousQueue = new LinkedList<>();
         visitedList = new ArrayList<>();
+        path = new ArrayList<>();
 
         //Set up cells and coordinates
         for(int x = 0; x < columns; x++) {
@@ -60,6 +65,8 @@ public class MazeGenerator {
         currentCell = maze[randomCol][randomRow];
         visitedList.add(currentCell);
         previousQueue.add(currentCell);
+
+        //System.out.println("1: " + maze[0][0].getNeighbours());
     }
 
     public void generate() {
@@ -69,7 +76,11 @@ public class MazeGenerator {
             Cell nextCell = getRandUnvisitedNeighbour(currentCell);
 
             if(nextCell != null) {
+                //Remove the wall between the cells and connect them
                 currentCell.removeWall(nextCell);
+                currentCell.addConnected(nextCell);
+                nextCell.addConnected(currentCell);
+
                 currentCell = nextCell;
                 previousQueue.add(currentCell);
                 visitedList.add(currentCell);
@@ -77,6 +88,16 @@ public class MazeGenerator {
                 if(!previousQueue.isEmpty()) {
                     currentCell = previousQueue.remove(0);
                 }
+            }
+        } else {
+            //Maze has finished generating, get shortest path
+            currentCell = null;
+            if(noLoop) {
+                path = findPath(maze[0][0], maze[5][5]);
+                for(Cell cell : path) {
+                    System.out.println(cell);
+                }
+                noLoop = false;
             }
         }
     }
@@ -92,6 +113,43 @@ public class MazeGenerator {
             }
         }
         return null;
+    }
+
+    public List<Cell> findPath(Cell start, Cell end) {
+        //Cells to visit
+        List<Cell> queue = new LinkedList<>();
+        //Predecessor map to find shortest path
+        Map<Cell, Cell> predecessors = new HashMap<>();
+
+        queue.add(start);
+        predecessors.put(start, start);
+
+        while(!queue.isEmpty()) {
+            Cell current = queue.remove(0);
+            //If the end cell is found, exit the loop
+            if(current.equals(end)) {
+                break;
+            }
+            for(Cell connected : current.getConnected()) {
+                //Add neighbour to map if not visited
+                if(!predecessors.containsKey(connected)) {
+                    predecessors.put(connected, current);
+                    queue.add(connected);
+                }
+            }
+        }
+
+        //Create shortest path
+        List<Cell> shortestPath = new LinkedList<>();
+        if(predecessors.containsKey(end)) {
+            Cell current = end;
+            while(!current.equals(start)) {
+                shortestPath.add(0, current);
+                current = predecessors.get(current);
+            }
+            shortestPath.add(0, start);
+        }
+        return shortestPath;
     }
 
     public int getRows() {
@@ -116,5 +174,9 @@ public class MazeGenerator {
 
     public Cell getCurrentCell() {
         return currentCell;
+    }
+
+    public List<Cell> getPath() {
+        return path;
     }
 }

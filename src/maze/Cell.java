@@ -2,17 +2,21 @@ package maze;
 
 import java.util.ArrayList;
 
-public class Cell {
+public class Cell implements Comparable<Cell> {
     private final int x;
     private final int y;
 
     private boolean hasRightWall = true;
     private boolean hasBottomWall = true;
 
+    //List of all cells adjacent to the cell
     private ArrayList<Cell> neighbours;
+    //List of all cells that are not blocked by a wall
+    private ArrayList<Cell> connected;
 
     public Cell(int x, int y) {
         neighbours = new ArrayList<>();
+        connected = new ArrayList<>();
         this.x = x;
         this.y = y;
     }
@@ -27,6 +31,14 @@ public class Cell {
         }
     }
 
+    public void addConnected(Cell cell) {
+        if(!connected.contains(cell)) {
+            connected.add(cell);
+            //do i need this???
+            //connected.sort(Cell::compareTo);
+        }
+    }
+
     /**
      * Remove the wall between two cells
      * @param next The cell next to the current cell
@@ -35,6 +47,7 @@ public class Cell {
         //If next cell is left of the current cell
         if(next.getX() + 1 == getX() && next.getY() == getY()) {
             next.setHasRightWall(false);
+            //addConnected(next);
         }
 
         //If next cell is right of the current cell
@@ -73,6 +86,10 @@ public class Cell {
         return neighbours;
     }
 
+    public ArrayList<Cell> getConnected() {
+        return connected;
+    }
+
     public int getX() {
         return x;
     }
@@ -95,5 +112,14 @@ public class Cell {
     @Override
     public String toString() {
         return x + " " + y;
+    }
+
+    @Override
+    public int compareTo(Cell o) {
+        int result = this.x - o.x;
+        if(result == 0) {
+            result = this.y - o.y;
+        }
+        return result;
     }
 }
