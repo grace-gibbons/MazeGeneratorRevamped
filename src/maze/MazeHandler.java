@@ -10,9 +10,6 @@ public class MazeHandler extends PApplet {
 
     public static void main(String[] args) {
         PApplet.main("maze.MazeHandler");
-
-        //mazeGenerator
-
     }
 
     public void settings() {
@@ -27,12 +24,21 @@ public class MazeHandler extends PApplet {
     public void draw() {
         background(0, 0, 0);
 
-        //Draw the cells
+        if(mazeGenerator.getVisitedList().size() != mazeGenerator.getTotalCells()) {
+            mazeGenerator.generate();
+        }
+
+
+        //Draw the maze cells
+        /*
         for(int x = 0; x < mazeGenerator.getColumns(); x++) {
             for(int y = 0; y < mazeGenerator.getRows(); y++) {
-                graphicsHandler.drawCell(x, y);
+                graphicsHandler.drawCell(mazeGenerator.getCell(x, y));
             }
-        }
+        }*/
+        graphicsHandler.drawMaze(mazeGenerator);
+        //Draw maze border
+        graphicsHandler.drawBorder(mazeGenerator.getRows(), mazeGenerator.getColumns());
 
     }
 }
